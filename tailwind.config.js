@@ -3,6 +3,7 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/preline/dist/*.js",
   ],
   theme: {
     extend: {
@@ -27,6 +28,8 @@ export default {
       xl: "1280px",
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/forms'), // Agrega el plugin de Forms
+  ],
 }
 

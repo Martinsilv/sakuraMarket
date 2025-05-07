@@ -6,12 +6,24 @@ import iconRamen from "../assets/fideos.png";
 import iconSnack from "../assets/cookies.png";
 import iconRefresco from "../assets/refresco.png";
 import iconDulces from "../assets/dulce.png";
+import iconBazar from "../assets/bazar.png";
+import iconIndumentaria from "../assets/percha.png";
+import iconPeluches from "../assets/oso-de-peluche.png";
 import { ProductList } from "./productList";
 import { Footer } from "./footer";
 
 export const Inicio = () => {
   const [selectedCategory, setSelectedCategory] = useState("Todos");
 
+  const handleScroll = () => {
+    const productsSection = document.getElementById("products-section");
+    if (productsSection) {
+      productsSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  };
   const Button = ({ text, img, src, alt, onClick }) => (
     <div className="flex flex-col items-center justify-center">
       <button
@@ -39,35 +51,80 @@ export const Inicio = () => {
               src={todos}
               alt="todos"
               text="Todos"
-              onClick={() => setSelectedCategory("Todos")}
+              onClick={() => {
+                setSelectedCategory("Todos");
+                handleScroll();
+              }}
             />
             <Button
               img
               src={iconRamen}
               alt="ramen"
               text="Ramen"
-              onClick={() => setSelectedCategory("ramen")}
+              onClick={() => {
+                setSelectedCategory("ramen");
+                handleScroll();
+              }}
             />
             <Button
               img
               src={iconSnack}
               alt="snacks"
               text="Snacks"
-              onClick={() => setSelectedCategory("snacks")}
+              onClick={() => {
+                setSelectedCategory("snacks");
+                handleScroll();
+              }}
             />
             <Button
               img
               src={iconRefresco}
               alt="refrescos"
               text="Refrescos"
-              onClick={() => setSelectedCategory("refrescos")}
+              onClick={() => {
+                setSelectedCategory("refrescos");
+                handleScroll();
+              }}
             />
             <Button
               img
               src={iconDulces}
               alt="dulces"
               text="Dulces"
-              onClick={() => setSelectedCategory("dulces")}
+              onClick={() => {
+                setSelectedCategory("dulces");
+                handleScroll();
+              }}
+            />
+            <Button
+              img
+              src={iconBazar}
+              alt="bazar"
+              text="Bazar"
+              onClick={() => {
+                setSelectedCategory("bazar");
+                handleScroll();
+              }}
+            />
+            <Button
+              img
+              src={iconIndumentaria}
+              alt="indumentaria"
+              text="Indumentaria"
+              onClick={() => {
+                setSelectedCategory("indumentaria");
+                handleScroll();
+              }}
+            />
+            <Button
+              img
+              src={iconPeluches}
+              alt="peluches"
+              text="peluches"
+              onClick={() => {
+                setSelectedCategory("peluches");
+                handleScroll();
+              }}
             />
           </div>
         </div>

@@ -118,7 +118,7 @@ export const Cart = () => {
                     </button>
                   </div>
                   <p className="block font-sans text-lg font-medium text-gray-600 antialiased">
-                    Precio: ${item.price}
+                    Precio: ${item.salePrice ? item.salePrice : item.price}
                   </p>
                   <p className="block font-sans text-m font-medium text-gray-600 antialiased">
                     Cantidad en el carrito:
@@ -164,25 +164,28 @@ export const Cart = () => {
             <p className="text-lg font-semibold font-sans text-gray-700 antialiased pt-4">
               total de la compra
             </p>
-            {cart.map((item) => (
-              <div
-                key={item.id}
-                className="flex justify-center text-base font-medium w-full"
-              >
-                <ul className="flex w-4/5 justify-between p-3 border-pink-200 border-b">
-                  <li>-{item.name}</li>
-                  <li>${item.price * item.quantity}</li>
-                </ul>
-              </div>
-            ))}
+            {cart.map((item) => {
+              const price = item.salePrice ?? item.price;
+              return (
+                <div
+                  key={item.id}
+                  className="flex justify-center text-base font-medium w-full"
+                >
+                  <ul className="flex w-4/5 justify-between p-3 border-pink-200 border-b">
+                    <li>-{item.name}</li>
+                    <li>${price * item.quantity}</li>
+                  </ul>
+                </div>
+              );
+            })}
 
             <div className="flex justify-center items-center w-full h-20">
               <p className="text-4xl font-semibold font-sans text-gray-700 antialiased">
                 $
-                {cart.reduce(
-                  (total, item) => total + item.price * item.quantity,
-                  0
-                )}
+                {cart.reduce((total, item) => {
+                  const price = item.salePrice ?? item.price;
+                  return total + price * item.quantity;
+                }, 0)}
               </p>
             </div>
             <div className="pb-4">

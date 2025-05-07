@@ -6,6 +6,11 @@ import Swal from "sweetalert2";
 import { useCart } from "./style/context/cartContext";
 import { Footer } from "./footer";
 import { Nav } from "./nav";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 export const ProductDetails = () => {
   const { id } = useParams(); // Obtener el ID del producto desde la URL
@@ -83,11 +88,44 @@ export const ProductDetails = () => {
         <div className="bg-white shadow-lg rounded-lg max-w-5xl w-full overflow-hidden flex flex-col md:flex-row">
           {/* Imagen del producto */}
           <div className="relative md:w-1/2">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="w-full h-80 object-cover md:h-full"
-            />
+            <divn>
+              {product.images && product.images.length > 0 ? (
+                // 🌀 Slider con múltiples imágenes
+                <Swiper
+                  modules={[Navigation, Pagination]}
+                  navigation
+                  pagination={{ clickable: true }}
+                  loop={true}
+                  className="rounded-lg"
+                >
+                  {product.images.map((imgUrl, index) => (
+                    <SwiperSlide key={index}>
+                      <img
+                        src={imgUrl}
+                        alt={`${product.name} ${index + 1}`}
+                        className="object-cover w-full h-80 md:h-[500px] rounded-lg"
+                      />
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              ) : (
+                // 🖼️ Imagen única
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-80 object-cover md:h-full rounded-lg"
+                />
+              )}
+
+              {product.quantity === 0 && (
+                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                  <span className="text-white text-xl font-semibold">
+                    Sin stock
+                  </span>
+                </div>
+              )}
+            </divn>
+
             {product.quantity === 0 && (
               <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                 <span className="text-white text-xl font-semibold">
@@ -112,7 +150,18 @@ export const ProductDetails = () => {
             {/* Precio y botón */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
               <span className="text-xl md:text-2xl font-bold text-green-600 mb-4 md:mb-0">
-                ${product.price}
+                {product.salePrice ? (
+                  <div className="flex items-center gap-2">
+                    <p className="text-lg text-gray-500 line-through">
+                      ${product.price}
+                    </p>
+                    <p className="text-xl font-bold text-green-600">
+                      ${product.salePrice}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-xl font-bold">${product.price}</p>
+                )}
               </span>
 
               <button

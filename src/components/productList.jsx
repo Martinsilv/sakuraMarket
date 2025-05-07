@@ -58,6 +58,12 @@ export const ProductList = ({ selectedCategory }) => {
         {filteredProducts.map((item) => (
           <div key={item.id} className="flex justify-center">
             <div className="transform transition duration-300 hover:scale-110 rounded-lg shadow-lg h-fit w-full max-w-64 hover:shadow-xl bg-white">
+              {item.salePrice ? (
+                <div className=" w-20 h-6 rounded-xl bg-green-600 absolute top-4 left-2 flex items-center justify-center text-white font-bold text-sm">
+                  OFERTA
+                </div>
+              ) : null}
+
               <img
                 src={item.image}
                 alt="imageProduct"
@@ -76,19 +82,30 @@ export const ProductList = ({ selectedCategory }) => {
                     ? `Últimas ${item.quantity}`
                     : "En stock"}
                 </span>
-                <p className="text-xl font-bold">${item.price}</p>
+                {item.salePrice ? (
+                  <div className="flex items-center gap-2">
+                    <p className="text-lg text-gray-500 line-through">
+                      ${item.price}
+                    </p>
+                    <p className="text-xl font-bold text-green-600">
+                      ${item.salePrice}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-xl font-bold">${item.price}</p>
+                )}
 
                 <Link
                   to={`/product/${item.id}`}
-                  className="text-blue-500 underline mt-2 inline-block"
+                  className=" bg-primary-violet rounded-lg h-9 text-white text-base mt-2 flex items-center justify-center hover:bg-purple-500 cursor-pointer"
                 >
-                  Ver detalles
+                  Ver descripcion
                 </Link>
                 <button
                   className={`bg-primary-violet text-white px-2 py-2 mt-2 rounded-md transition duration-150 ${
                     item.quantity === 0
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "hover:bg-purple-500 cursor-pointer"
+                      ? "bg-gray-500 cursor-not-allowed"
+                      : "hover:bg-purple-400 cursor-pointer"
                   }`}
                   type="button"
                   onClick={() => addToCartAlert(item)}
