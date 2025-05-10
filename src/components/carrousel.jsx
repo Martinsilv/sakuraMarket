@@ -7,13 +7,13 @@ import imagen5 from "../assets/5.png";
 import imagen6 from "../assets/6.png";
 import imagen7 from "../assets/7.png";
 import imagenResponsive from "../assets/11.png";
-import imagenResponsive1 from "../assets/22.png";
+import imagenResponsive1 from "../assets/110.png";
 import imagenResponsive2 from "../assets/33.png";
 import imagenResponsive3 from "../assets/44.png";
-import imagenResponsive4 from "../assets/55.png";
+import imagenResponsive4 from "../assets/100.png";
 import imagenResponsive5 from "../assets/66.png";
 import imagenResponsive6 from "../assets/77.png";
-import imagenResponsive7 from "../assets/88.png";
+import imagenResponsive7 from "../assets/99.png";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 
@@ -77,21 +77,21 @@ export default function Carrousel() {
             </SwiperSlide>
             <SwiperSlide>
               <img
-                src={imagenResponsive2}
-                alt="responsive-banner"
-                className="w-screen h-96 object-cover"
-              />
-            </SwiperSlide>
-            <SwiperSlide>
-              <img
-                src={imagenResponsive3}
-                alt="responsive-banner"
-                className="w-screen h-96 object-cover"
-              />
-            </SwiperSlide>
-            <SwiperSlide>
-              <img
                 src={imagenResponsive4}
+                alt="responsive-banner"
+                className="w-screen h-96 object-cover"
+              />
+            </SwiperSlide>
+            <SwiperSlide>
+              <img
+                src={imagenResponsive7}
+                alt="responsive-banner"
+                className="w-screen h-96 object-cover"
+              />
+            </SwiperSlide>
+            <SwiperSlide>
+              <img
+                src={imagenResponsive2}
                 alt="responsive-banner"
                 className="w-screen h-96 object-cover"
               />
@@ -112,7 +112,7 @@ export default function Carrousel() {
             </SwiperSlide>
             <SwiperSlide>
               <img
-                src={imagenResponsive7}
+                src={imagenResponsive3}
                 alt="responsive-banner"
                 className="w-screen h-96 object-cover"
               />
