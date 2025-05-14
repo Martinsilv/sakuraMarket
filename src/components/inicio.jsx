@@ -45,7 +45,7 @@ export const Inicio = () => {
       <body>
         <div className="flex flex-col items-center justify-center p-6 md:p-12">
           <h1 className="text-2xl font-bold mb-8">Productos</h1>
-          <div className="flex flex-wrap justify-center items-center gap-4 md:gap-x-20">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-16 px-6 ">
             <Button
               img
               src={todos}

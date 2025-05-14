@@ -8,6 +8,8 @@ import { Footer } from "./footer";
 import { Nav } from "./nav";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
+import Lottie from "lottie-react";
+import loaderAnimation from "../assets/Animation-11.json";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -63,8 +65,14 @@ export const ProductDetails = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-lg font-medium text-gray-500 animate-pulse">
+      <div className="flex flex-col items-center justify-center h-screen gap-4">
+        <Lottie
+          animationData={loaderAnimation}
+          loop
+          autoplay
+          className="w-40 h-40"
+        />
+        <p className="text-lg font-medium text-gray-500">
           Cargando producto...
         </p>
       </div>

@@ -3,7 +3,7 @@ import { db } from "../../firebaseConfig";
 import { collection, onSnapshot } from "firebase/firestore";
 import { useCart } from "./style/context/cartContext";
 import Swal from "sweetalert2";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 export const ProductList = ({ selectedCategory }) => {
   const [product, setProduct] = useState([]);
   const { addToCart } = useCart();
@@ -46,6 +46,11 @@ export const ProductList = ({ selectedCategory }) => {
     });
   };
 
+  const navigate = useNavigate();
+  const handleCard = (productId) => {
+    navigate(`/product/${productId}`);
+  };
+
   // Filtrar productos según la categoría seleccionada
   const filteredProducts =
     selectedCategory === "Todos"
@@ -58,7 +63,10 @@ export const ProductList = ({ selectedCategory }) => {
         <div className="m-4 sm:m-6 md:m-8 lg:m-12 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6 lg:gap-6">
           {filteredProducts.map((item) => (
             <div key={item.id} className="flex justify-center">
-              <div className="transform transition duration-300 hover:scale-110 rounded-lg shadow-lg h-fit w-full max-w-64 hover:shadow-xl bg-white">
+              <div
+                onClick={() => handleCard(item.id)}
+                className="transform transition duration-300 hover:scale-110 rounded-lg shadow-lg h-fit w-full max-w-64 hover:shadow-xl bg-white"
+              >
                 {item.salePrice ? (
                   <div className=" w-20 h-6 rounded-xl bg-green-600 absolute top-4 left-2 flex items-center justify-center text-white font-bold text-sm">
                     OFERTA
