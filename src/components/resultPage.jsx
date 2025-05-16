@@ -1,31 +1,31 @@
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { db } from "../../firebaseConfig";
-import { collection, onSnapshot } from "firebase/firestore";
-import { useCart } from "./style/context/cartContext";
+import { Nav } from "./nav";
 import Swal from "sweetalert2";
-import { Link, useNavigate } from "react-router-dom";
-import loaderAnimation from "../assets/Animation-11.json";
 import Lottie from "lottie-react";
-export const ProductList = ({ selectedCategory }) => {
-  const [product, setProduct] = useState([]);
+import { Link } from "react-router-dom";
+import loaderAnimation from "../assets/Animation-11.json";
+import { useCart } from "./style/context/cartContext";
+import { Footer } from "./footer";
+
+export const Resultados = ({ products }) => {
+  const location = useLocation();
+  const [filtered, setFiltered] = useState([]);
   const { addToCart } = useCart();
   const [loading, setLoading] = useState(true);
 
+  // Obtener el texto de búsqueda desde la URL
+  const searchParams = new URLSearchParams(location.search);
+  const searchText = searchParams.get("search") || "";
   useEffect(() => {
-    const products = collection(db, "sakura-products");
+    if (products.length === 0) return; // Espera hasta que haya productos
 
-    // Listener para actualizaciones en tiempo real
-    const unsubscribe = onSnapshot(products, (snapshot) => {
-      const updatedProducts = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setProduct(updatedProducts);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
+    const results = products.filter((p) =>
+      p.name.toLowerCase().includes(searchText.toLowerCase())
+    );
+    setFiltered(results);
+    setLoading(false);
+  }, [searchText, products]);
 
   const addToCartAlert = (product) => {
     Swal.fire({
@@ -55,12 +55,6 @@ export const ProductList = ({ selectedCategory }) => {
     navigate(`/product/${productId}`);
   };
 
-  // Filtrar productos según la categoría seleccionada
-  const filteredProducts =
-    selectedCategory === "Todos"
-      ? product
-      : product.filter((item) => item.category === selectedCategory);
-
   // Mostrar un mensaje de carga mientras se obtienen los productos
   if (loading) {
     return (
@@ -70,14 +64,26 @@ export const ProductList = ({ selectedCategory }) => {
           loop={true}
           className="w-32 h-32 top-0"
         />
+        <p className="text-lg font-medium text-gray-500">
+          Cargando producto...
+        </p>
       </div>
     );
   }
   return (
     <>
+      <div>
+        <Nav />
+      </div>
+      <span>
+        {" "}
+        <h2 className="text-xl font-bold mb-4">
+          Resultados de búsqueda: "{searchText}"
+        </h2>
+      </span>
       <section id="products-section">
         <div className="m-4 sm:m-6 md:m-8 lg:m-12 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6 lg:gap-6">
-          {filteredProducts.map((item) => (
+          {filtered.map((item) => (
             <div key={item.id} className="flex justify-center">
               <div
                 onClick={() => handleCard(item.id)}
@@ -144,6 +150,7 @@ export const ProductList = ({ selectedCategory }) => {
           ))}
         </div>
       </section>
+      <Footer />
     </>
   );
 };

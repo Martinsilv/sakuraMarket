@@ -40,7 +40,7 @@ export const Nav = () => {
 
         {/* Search (ocultar en móviles) */}
         <div className="hidden md:block pb-5">
-          <Search products={products} />
+          <Search products={products} closeMenu={() => setMenuOpen(false)} />
         </div>
 
         {/* Menú Hamburguesa (visible en móviles) */}
@@ -106,14 +106,12 @@ export const Nav = () => {
             >
               <AddToCart />
             </li>
-
-            {/* Search (versión móvil) */}
-            <div className="w-11/12 mt-4 flex justify-center">
-              <Search products={products} />
-            </div>
           </ul>
         </div>
       </nav>
+      <div className="w-auto pb-4 flex justify-center items-center bg-white  lg:hidden">
+        <Search products={products} closeMenu={() => setMenuOpen(false)} />
+      </div>
     </div>
   );
 };
