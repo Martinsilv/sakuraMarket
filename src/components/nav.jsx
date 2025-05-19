@@ -109,7 +109,7 @@ export const Nav = () => {
           </ul>
         </div>
       </nav>
-      <div className="w-auto pb-4 flex justify-center items-center bg-white  lg:hidden">
+      <div className="w-auto pb-4 flex justify-center items-center bg-gray-50  lg:hidden">
         <Search products={products} closeMenu={() => setMenuOpen(false)} />
       </div>
     </div>

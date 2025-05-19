@@ -83,7 +83,7 @@ export const Cart = () => {
     setCart(updatedCart);
   };
   return (
-    <div className="bg-gray-200 min-h-screen">
+    <div className="bg-gray-50 min-h-screen">
       <Nav />
       {/* Contenedor principal con flex responsivo */}
       <div className="flex flex-col md:flex-row justify-between mt-6">

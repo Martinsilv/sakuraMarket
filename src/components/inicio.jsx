@@ -42,7 +42,7 @@ export const Inicio = () => {
   );
 
   return (
-    <div className="bg-gray-200 h-full">
+    <div className="bg-gray-50 h-full">
       <header>
         <Nav />
         <Carrousel />

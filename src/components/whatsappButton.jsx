@@ -1,7 +1,6 @@
 import { useCart } from "./style/context/cartContext";
-
 export const WhatsAppButton = () => {
-  const { cart } = useCart();
+  const { cart, setCart } = useCart();
   const phoneNumber = "5493794950237"; // Reemplaza con tu número de WhatsApp (sin el +)
 
   const handleSendWhatsApp = () => {
@@ -41,6 +40,11 @@ export const WhatsAppButton = () => {
 
     // Abrir WhatsApp en una nueva pestaña
     window.open(whatsappURL, "_blank");
+
+    setTimeout(() => {
+      setCart([]);
+      localStorage.removeItem("compra-finalizada");
+    }, 10000);
   };
 
   return (

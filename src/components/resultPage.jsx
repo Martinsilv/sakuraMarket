@@ -71,13 +71,12 @@ export const Resultados = ({ products }) => {
     );
   }
   return (
-    <>
+    <div className="bg-gray-50 h-full">
       <div>
         <Nav />
       </div>
       <span>
-        {" "}
-        <h2 className="text-xl font-bold mb-4">
+        <h2 className="text-2xl font-sans mb-4 ml-4">
           Resultados de búsqueda: "{searchText}"
         </h2>
       </span>
@@ -151,6 +150,6 @@ export const Resultados = ({ products }) => {
         </div>
       </section>
       <Footer />
-    </>
+    </div>
   );
 };
