@@ -1,7 +1,8 @@
 import { createContext, useContext, useState, useEffect, useRef } from "react";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../../../firebaseConfig";
-
+import Swal from "sweetalert2";
+import "../../../App.css";
 const cartContext = createContext();
 export const useCart = () => useContext(cartContext);
 
@@ -28,7 +29,7 @@ export const CartProvider = ({ children }) => {
           ? {
               ...product,
               quantity: product.quantity + 1,
-              addedAt: now, // Reinicia tiempo
+              addedAt: now,
             }
           : product
       );
@@ -40,6 +41,7 @@ export const CartProvider = ({ children }) => {
           ...item,
           quantity: 1,
           addedAt: now,
+          image: item.image, // Asegurate de que el item tenga la imagen
         },
       ]);
     }
@@ -55,9 +57,9 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // SOLO UNA VEZ, revisa cada 10 segundos
+  // Revisa cada 10 segundos si algún producto se venció (20 minutos)
   useEffect(() => {
-    const expirationTime = 60 * 60 * 1000; // 1 hora
+    const expirationTime = 20 * 60 * 1000;
 
     const interval = setInterval(async () => {
       const now = Date.now();
@@ -73,6 +75,26 @@ export const CartProvider = ({ children }) => {
               quantity: product.quantity,
             });
 
+            // Mostrar alerta con imagen
+            Swal.fire({
+              toast: true,
+              position: "top-end",
+              icon: "info",
+              title: `Producto liberado`,
+              html: `Se devolvió "${product.name}" al stock.<strong> Debido a que expiró su tiempo en el carrito.</strong>`,
+              imageUrl: product.image,
+              imageWidth: 100,
+              imageHeight: 100,
+              imageAlt: product.name,
+              customClass: {
+                popup: "custom-toast",
+                image: "rounded-full",
+              },
+              showConfirmButton: false,
+              timer: 4000,
+              timerProgressBar: true,
+            });
+
             console.log(`Producto ${product.id} devuelto al stock`);
           } catch (error) {
             console.error("Error al devolver stock:", error);
@@ -85,7 +107,7 @@ export const CartProvider = ({ children }) => {
       if (newCart.length !== cartRef.current.length) {
         setCart(newCart);
       }
-    }, 600000); // cada 10 segundos
+    }, 10000);
 
     return () => clearInterval(interval);
   }, []);

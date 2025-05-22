@@ -1,0 +1,6 @@
+.custom-toast {
+  height: 320px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+}
