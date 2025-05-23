@@ -13,19 +13,31 @@ export const WhatsAppButton = () => {
     let messageText =
       "Hola Sakura 🌸, quisiera realizar la siguiente compra:\n\n";
 
-    // Agregar cada producto
+    // Agregar cada producto al mensaje con el precio correcto
     cart.forEach((item) => {
+      const hasSale =
+        item.salePrice !== undefined &&
+        item.salePrice !== null &&
+        item.salePrice !== "";
+      const price = hasSale ? item.salePrice : item.price;
+
       messageText += `Producto: ${item.name}\n`;
       messageText += `Cantidad: ${item.quantity}\n`;
-      messageText += `Precio: $${item.price}\n\n`;
+      messageText += `Precio: $${price}${hasSale ? " (oferta)" : ""}\n\n`;
     });
 
-    // Calcular y agregar el total
-    const totalPrice = cart.reduce(
-      (total, item) => total + item.price * item.quantity,
-      0
-    );
-    messageText += `\nTotal: $${totalPrice}`;
+    // Calcular el total con precios individuales
+    const totalPrice = cart.reduce((total, item) => {
+      const hasSale =
+        item.salePrice !== undefined &&
+        item.salePrice !== null &&
+        item.salePrice !== "";
+      const price = hasSale ? item.salePrice : item.price;
+
+      return total + price * item.quantity;
+    }, 0);
+
+    messageText += `Total: $${totalPrice}`;
 
     // Codificar el mensaje
     const encodedMessage = encodeURIComponent(messageText);
