@@ -6,15 +6,18 @@ import Swal from "sweetalert2";
 import { Link, useNavigate } from "react-router-dom";
 import loaderAnimation from "../assets/Animation-11.json";
 import Lottie from "lottie-react";
+import arrowUp from "../assets/flecha-arriba.png";
+
 export const ProductList = ({ selectedCategory }) => {
   const [product, setProduct] = useState([]);
   const { addToCart } = useCart();
   const [loading, setLoading] = useState(true);
+  const [filterOption, setFilterOption] = useState("default");
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
     const products = collection(db, "sakura-products");
 
-    // Listener para actualizaciones en tiempo real
     const unsubscribe = onSnapshot(products, (snapshot) => {
       const updatedProducts = snapshot.docs.map((doc) => ({
         id: doc.id,
@@ -26,6 +29,20 @@ export const ProductList = ({ selectedCategory }) => {
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const isHalfScrolled = window.scrollY > 1000;
+      setShowScrollTop(isHalfScrolled);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 600, behavior: "smooth" });
+  };
 
   const addToCartAlert = (product) => {
     Swal.fire({
@@ -40,7 +57,6 @@ export const ProductList = ({ selectedCategory }) => {
     }).then((result) => {
       if (result.isConfirmed) {
         addToCart(product);
-        console.log(`${product.name} añadido al carrito.`);
         Swal.fire(
           "Añadido!",
           "El producto ha sido añadido al carrito.",
@@ -55,39 +71,76 @@ export const ProductList = ({ selectedCategory }) => {
     navigate(`/product/${productId}`);
   };
 
-  // Filtrar productos según la categoría seleccionada
-  const filteredProducts =
+  const filteredByCategory =
     selectedCategory === "Todos"
       ? product
       : product.filter((item) => item.category === selectedCategory);
 
-  // Mostrar un mensaje de carga mientras se obtienen los productos
+  const filteredAndSortedProducts = [...filteredByCategory]
+    .filter((item) => {
+      if (filterOption === "stock") return item.quantity > 0;
+      if (filterOption === "on-sale") return !!item.salePrice;
+      return true;
+    })
+    .sort((a, b) => {
+      if (filterOption === "price-asc") {
+        return (a.salePrice || a.price) - (b.salePrice || b.price);
+      }
+      if (filterOption === "price-desc") {
+        return (b.salePrice || b.price) - (a.salePrice || a.price);
+      }
+      if (filterOption === "az") {
+        return a.name.localeCompare(b.name);
+      }
+      if (filterOption === "za") {
+        return b.name.localeCompare(a.name);
+      }
+      return 0;
+    });
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <Lottie
           animationData={loaderAnimation}
           loop={true}
-          className="w-32 h-32 top-0"
+          className="w-32 h-32"
         />
       </div>
     );
   }
+
   return (
     <>
       <section id="products-section">
+        <div className="flex justify-center mb-4">
+          <select
+            className="border-2 border-primary-violerHover px-3 py-2 rounded-md text-base md:w-1/4 w-2/3 focus:outline-none focus:border-primary-violerHover"
+            value={filterOption}
+            onChange={(e) => setFilterOption(e.target.value)}
+          >
+            <option value="default">Ordenar por...</option>
+            <option value="price-asc">Precio: menor a mayor</option>
+            <option value="price-desc">Precio: mayor a menor</option>
+            <option value="az">A-Z</option>
+            <option value="za">Z-A</option>
+            <option value="stock">Solo con stock</option>
+            <option value="on-sale">Solo en oferta</option>
+          </select>
+        </div>
+
         <div className="m-4 sm:m-6 md:m-8 lg:m-12 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6 lg:gap-6">
-          {filteredProducts.map((item) => (
+          {filteredAndSortedProducts.map((item) => (
             <div key={item.id} className="flex justify-center">
               <div
                 onClick={() => handleCard(item.id)}
-                className="transform transition duration-300 hover:scale-105 rounded-lg shadow-lg h-fit w-full max-w-64 hover:shadow-xl bg-white"
+                className="transform transition duration-300 hover:scale-105 rounded-lg shadow-lg h-fit w-full max-w-64 hover:shadow-xl bg-white relative"
               >
-                {item.salePrice ? (
-                  <div className=" w-20 h-6 rounded-xl bg-green-600 absolute top-4 left-2 flex items-center justify-center text-white font-bold text-sm">
+                {item.salePrice && (
+                  <div className="absolute w-20 h-6 rounded-xl bg-green-600 top-4 left-2 flex items-center justify-center text-white font-bold text-sm">
                     OFERTA
                   </div>
-                ) : null}
+                )}
 
                 <img
                   src={item.image}
@@ -122,9 +175,9 @@ export const ProductList = ({ selectedCategory }) => {
 
                   <Link
                     to={`/product/${item.id}`}
-                    className=" bg-primary-violet rounded-lg h-9 text-white text-base mt-2 flex items-center justify-center hover:bg-purple-500 cursor-pointer"
+                    className="bg-primary-violet rounded-lg h-9 text-white text-base mt-2 flex items-center justify-center hover:bg-purple-500 cursor-pointer"
                   >
-                    Ver descripcion
+                    Ver descripción
                   </Link>
                   <button
                     className={`bg-primary-violet text-white px-2 py-2 mt-2 rounded-md transition duration-150 ${
@@ -144,6 +197,17 @@ export const ProductList = ({ selectedCategory }) => {
           ))}
         </div>
       </section>
+
+      {/* Botón flotante de volver arriba */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 bg-purple-600 text-white p-3 w-12 rounded-full shadow-lg hover:bg-purple-500 transition-all z-50"
+          aria-label="Volver arriba"
+        >
+          <img src={arrowUp} alt="Flecha arriba" />
+        </button>
+      )}
     </>
   );
 };

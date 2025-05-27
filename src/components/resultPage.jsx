@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import loaderAnimation from "../assets/Animation-11.json";
 import { useCart } from "./style/context/cartContext";
 import { Footer } from "./footer";
+import arrowUp from "../assets/flecha-arriba.png";
 
 export const Resultados = ({ products }) => {
   const location = useLocation();
@@ -14,6 +15,7 @@ export const Resultados = ({ products }) => {
   const { addToCart } = useCart();
   const [loading, setLoading] = useState(true);
 
+  const [showScrollTop, setShowScrollTop] = useState(false);
   // Obtener el texto de búsqueda desde la URL
   const searchParams = new URLSearchParams(location.search);
   const searchText = searchParams.get("search") || "";
@@ -26,6 +28,20 @@ export const Resultados = ({ products }) => {
     setFiltered(results);
     setLoading(false);
   }, [searchText, products]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const isHalfScrolled = window.scrollY > 1000;
+      setShowScrollTop(isHalfScrolled);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 600, behavior: "smooth" });
+  };
 
   const addToCartAlert = (product) => {
     Swal.fire({
@@ -149,6 +165,16 @@ export const Resultados = ({ products }) => {
           ))}
         </div>
       </section>
+      {/* Botón flotante de volver arriba */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 bg-purple-600 text-white p-3 w-12 rounded-full shadow-lg hover:bg-purple-500 transition-all z-50"
+          aria-label="Volver arriba"
+        >
+          <img src={arrowUp} alt="Flecha arriba" />
+        </button>
+      )}
       <Footer />
     </div>
   );
