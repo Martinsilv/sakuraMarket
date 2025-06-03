@@ -9,7 +9,7 @@ export const WhatsAppButton = () => {
       return;
     }
 
-    // Crear el mensaje
+    // Crear el mensajes
     let messageText =
       "Hola Sakura 🌸, quisiera realizar la siguiente compra:\n\n";
 
