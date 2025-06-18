@@ -10,6 +10,7 @@ import { Resultados } from "./components/resultPage";
 import { useEffect, useState } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebaseConfig";
+import QuienesSomos from "./components/quienesSomos";
 
 function App() {
   const [products, setProduct] = useState([]);
@@ -39,6 +40,7 @@ function App() {
             path="/resultados"
             element={<Resultados products={products} />}
           />
+          <Route path="/quienesSomos" element={<QuienesSomos />} />
 
           {/* Ruta dinámica */}
         </Routes>

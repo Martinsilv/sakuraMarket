@@ -50,7 +50,7 @@ export const Inicio = () => {
       <body>
         <div className="flex flex-col items-center justify-center p-6 md:p-12">
           <h1 className="text-2xl font-bold mb-8">Productos</h1>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6  ">
+          <div className="grid grid-cols-2  gap-6  ">
             {/* Botón "Todos" */}
             <Button
               img
@@ -78,7 +78,7 @@ export const Inicio = () => {
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="col-span-2 md:col-span-5 grid grid-cols-2 md:grid-cols-4 gap-2  mt-4 overflow-hidden"
+                  className="col-span-2 lg:col-span-2 grid grid-cols-2 lg:grid-cols-5 gap-2  mt-4 overflow-hidden"
                 >
                   <Button
                     img

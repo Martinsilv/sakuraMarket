@@ -1,8 +1,9 @@
 import { createContext, useContext, useState, useEffect, useRef } from "react";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../../../firebaseConfig";
 import Swal from "sweetalert2";
 import "../../../App.css";
+
 const cartContext = createContext();
 export const useCart = () => useContext(cartContext);
 
@@ -41,7 +42,7 @@ export const CartProvider = ({ children }) => {
           ...item,
           quantity: 1,
           addedAt: now,
-          image: item.image, // Asegurate de que el item tenga la imagen
+          image: item.image,
         },
       ]);
     }
@@ -71,11 +72,16 @@ export const CartProvider = ({ children }) => {
         if (expired) {
           try {
             const productRef = doc(db, "sakura-products", product.id);
-            await updateDoc(productRef, {
-              quantity: product.quantity,
-            });
+            const productSnap = await getDoc(productRef);
 
-            // Mostrar alerta con imagen
+            if (productSnap.exists()) {
+              const currentStock = productSnap.data().quantity || 0;
+
+              await updateDoc(productRef, {
+                quantity: currentStock + product.quantity,
+              });
+            }
+
             Swal.fire({
               toast: true,
               position: "top-end",

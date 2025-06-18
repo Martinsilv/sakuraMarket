@@ -12,6 +12,18 @@ export const Nav = () => {
   const [menuOpen, setMenuOpen] = useState(false); // Estado para controlar el menú hamburguesa
 
   useEffect(() => {
+    const scrollTarget = localStorage.getItem("scrollToSection");
+
+    if (scrollTarget === "products") {
+      const targetElement = document.getElementById("products-section");
+      if (targetElement) {
+        targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      localStorage.removeItem("scrollToSection");
+    }
+  }, []);
+
+  useEffect(() => {
     const products = collection(db, "sakura-products");
 
     // Listener para actualizaciones en tiempo real
@@ -29,22 +41,27 @@ export const Nav = () => {
 
   return (
     <div>
-      <nav className="flex flex-row bg-white justify-between border-b-4 border-y-primary items-center relative">
-        {/* Logo */}
-        <img
-          src={miImagen}
-          alt="logo"
-          className="ml-5 flex justify-start w-16 h-16 rounded-full"
-        />
-        <h1 className="m-6 w-1/5 text-3xl text-primary-dark">Sakura Market</h1>
-
+      <nav className="flex flex-row bg-white justify-between border-b-4 border-y-primary items-center relative md: ">
+        <Link
+          to={"/"}
+          className="flex flex-row items-center  w-full md:w-1/4  "
+        >
+          <img
+            src={miImagen}
+            alt="logo"
+            className="ml-5 w-20 h-20 rounded-full"
+          />
+          <h1 className="mx-6 text-3xl text-center text-primary-dark">
+            Sakura Market
+          </h1>
+        </Link>
         {/* Search (ocultar en móviles) */}
-        <div className="hidden md:block pb-5">
+        <div className="hidden lg:block pb-5">
           <Search products={products} closeMenu={() => setMenuOpen(false)} />
         </div>
 
         {/* Menú Hamburguesa (visible en móviles) */}
-        <div className="md:hidden m-6 z-20">
+        <div className="lg:hidden m-6 z-20">
           <button
             className="text-primary-dark text-3xl"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -54,7 +71,7 @@ export const Nav = () => {
         </div>
 
         {/* Menú principal (desktop) */}
-        <ul className="hidden md:flex w-5/12 m-6 text-primary-dark text-xl flex-row justify-between items-center">
+        <ul className="hidden lg:flex w-5/12 m-6 text-primary-dark text-xl flex-row justify-between items-center">
           <Link
             to={"/"}
             className="hover:scale-110 transition-transform duration-150"
@@ -64,9 +81,12 @@ export const Nav = () => {
           <li className="hover:scale-110 transition-transform duration-150">
             <ScrollToProducts />
           </li>
-          <li className="hover:scale-110 transition-transform duration-150">
+          <Link
+            to={"/quienesSomos"}
+            className="hover:scale-110 transition-transform duration-150"
+          >
             ¿Quienes somos?
-          </li>
+          </Link>
           <li className="hover:scale-105 transition-transform duration-150">
             <AddToCart />
           </li>
@@ -94,12 +114,13 @@ export const Nav = () => {
             >
               <ScrollToProducts />
             </li>
-            <li
+            <Link
+              to={"/quienesSomos"}
               className="py-2 hover:scale-110 transition-transform duration-150"
               onClick={() => setMenuOpen(false)}
             >
               ¿Quienes somos?
-            </li>
+            </Link>
             <li
               className="py-2 hover:scale-105 transition-transform duration-150"
               onClick={() => setMenuOpen(false)}

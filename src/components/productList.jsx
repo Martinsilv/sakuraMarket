@@ -3,7 +3,7 @@ import { db } from "../../firebaseConfig";
 import { collection, onSnapshot } from "firebase/firestore";
 import { useCart } from "./style/context/cartContext";
 import Swal from "sweetalert2";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import loaderAnimation from "../assets/Animation-11.json";
 import Lottie from "lottie-react";
 import arrowUp from "../assets/flecha-arriba.png";
@@ -96,7 +96,8 @@ export const ProductList = ({ selectedCategory }) => {
         return b.name.localeCompare(a.name);
       }
       return 0;
-    });
+    })
+    .sort((a, b) => (b.quantity > 0 ? 1 : 0) - (a.quantity > 0 ? 1 : 0)); // 🔥 Esta es la línea nueva
 
   if (loading) {
     return (
@@ -173,16 +174,10 @@ export const ProductList = ({ selectedCategory }) => {
                     <p className="text-xl font-bold">${item.price}</p>
                   )}
 
-                  <Link
-                    to={`/product/${item.id}`}
-                    className="bg-primary-violet rounded-lg h-9 text-white text-base mt-2 flex items-center justify-center hover:bg-purple-500 cursor-pointer"
-                  >
-                    Ver descripción
-                  </Link>
                   <button
                     className={`bg-primary-violet text-white px-2 py-2 mt-2 rounded-md transition duration-150 ${
                       item.quantity === 0
-                        ? "bg-gray-500 cursor-not-allowed"
+                        ? "bg-slate-500 cursor-not-allowed"
                         : "hover:bg-purple-400 cursor-pointer"
                     }`}
                     type="button"
@@ -198,7 +193,6 @@ export const ProductList = ({ selectedCategory }) => {
         </div>
       </section>
 
-      {/* Botón flotante de volver arriba */}
       {showScrollTop && (
         <button
           onClick={scrollToTop}
