@@ -44,14 +44,14 @@ export const Nav = () => {
       <nav className="flex flex-row bg-white justify-between border-b-4 border-y-primary items-center relative md: ">
         <Link
           to={"/"}
-          className="flex flex-row items-center  w-full md:w-1/4  "
+          className="flex flex-row items-center  w-full lg:w-1/4  "
         >
           <img
             src={miImagen}
             alt="logo"
-            className="ml-5 w-20 h-20 rounded-full"
+            className="ml-5 w-16 h-16 rounded-full"
           />
-          <h1 className="mx-6 text-3xl text-center text-primary-dark">
+          <h1 className="mx-6 text-3xl  text-center text-primary-dark">
             Sakura Market
           </h1>
         </Link>
@@ -59,7 +59,9 @@ export const Nav = () => {
         <div className="hidden lg:block pb-5">
           <Search products={products} closeMenu={() => setMenuOpen(false)} />
         </div>
-
+        <div className="lg:hidden">
+          <AddToCart />
+        </div>
         {/* Menú Hamburguesa (visible en móviles) */}
         <div className="lg:hidden m-6 z-20">
           <button
@@ -93,6 +95,7 @@ export const Nav = () => {
         </ul>
 
         {/* Menú desplegable (mobile) */}
+
         <div
           className={`absolute left-0 w-full bg-white shadow-lg z-10 transition-all duration-300 transform ${
             menuOpen
@@ -124,9 +127,7 @@ export const Nav = () => {
             <li
               className="py-2 hover:scale-105 transition-transform duration-150"
               onClick={() => setMenuOpen(false)}
-            >
-              <AddToCart />
-            </li>
+            ></li>
           </ul>
         </div>
       </nav>
