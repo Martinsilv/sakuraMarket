@@ -43,13 +43,13 @@ export const Inicio = () => {
 
   return (
     <div className="bg-gray-50 h-full">
-      <header>
+      <header className="lg:pt-20">
         <Nav />
         <Carrousel />
       </header>
-      <body>
+      <body id="products-section">
         <div className="flex flex-col items-center justify-center p-6 md:p-12">
-          <h1 className="text-2xl font-bold mb-8">Productos</h1>
+          <h1 className="text-2xl font-bold mb-8 pt-16 ">Productos</h1>
           <div className="grid grid-cols-2  gap-6  ">
             {/* Botón "Todos" */}
             <Button

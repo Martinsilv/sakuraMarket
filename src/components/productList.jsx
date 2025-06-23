@@ -14,6 +14,7 @@ export const ProductList = ({ selectedCategory }) => {
   const [loading, setLoading] = useState(true);
   const [filterOption, setFilterOption] = useState("default");
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const products = collection(db, "sakura-products");
@@ -32,7 +33,7 @@ export const ProductList = ({ selectedCategory }) => {
 
   useEffect(() => {
     const handleScroll = () => {
-      const isHalfScrolled = window.scrollY > 1000;
+      const isHalfScrolled = window.scrollY > 1300;
       setShowScrollTop(isHalfScrolled);
     };
 
@@ -66,7 +67,6 @@ export const ProductList = ({ selectedCategory }) => {
     });
   };
 
-  const navigate = useNavigate();
   const handleCard = (productId) => {
     navigate(`/product/${productId}`);
   };
@@ -78,7 +78,16 @@ export const ProductList = ({ selectedCategory }) => {
 
   const filteredAndSortedProducts = [...filteredByCategory]
     .filter((item) => {
-      if (filterOption === "stock") return item.quantity > 0;
+      if (filterOption === "stock") {
+        if (item.variants) {
+          return Object.values(item.variants).some((v) =>
+            typeof v === "number"
+              ? v > 0
+              : Object.values(v).some((qty) => qty > 0)
+          );
+        }
+        return item.quantity > 0;
+      }
       if (filterOption === "on-sale") return !!item.salePrice;
       return true;
     })
@@ -97,26 +106,34 @@ export const ProductList = ({ selectedCategory }) => {
       }
       return 0;
     })
-    .sort((a, b) => (b.quantity > 0 ? 1 : 0) - (a.quantity > 0 ? 1 : 0)); // 🔥 Esta es la línea nueva
+    .sort((a, b) => {
+      const hasStock = (p) => {
+        if (p.variants) {
+          return Object.values(p.variants).some((v) =>
+            typeof v === "number"
+              ? v > 0
+              : Object.values(v).some((qty) => qty > 0)
+          );
+        }
+        return p.quantity > 0;
+      };
+      return (hasStock(b) ? 1 : 0) - (hasStock(a) ? 1 : 0);
+    });
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <Lottie
-          animationData={loaderAnimation}
-          loop={true}
-          className="w-32 h-32"
-        />
+        <Lottie animationData={loaderAnimation} loop className="w-32 h-32" />
       </div>
     );
   }
 
   return (
-    <>
-      <section id="products-section">
+    <div className="pt-10">
+      <section>
         <div className="flex justify-center mb-4">
           <select
-            className="border-2 border-primary-violerHover px-3 py-2 rounded-md text-base md:w-1/4 w-2/3 focus:outline-none focus:border-primary-violerHover"
+            className="border-2 border-primary-violerHover px-3 py-2 -mt-10 rounded-md text-base md:w-1/4 w-2/3 focus:outline-none focus:border-primary-violerHover"
             value={filterOption}
             onChange={(e) => setFilterOption(e.target.value)}
           >
@@ -153,14 +170,26 @@ export const ProductList = ({ selectedCategory }) => {
                     {item.name}
                   </h2>
                   <span className="text-sm font-thin opacity-75">
-                    {item.quantity === 0
-                      ? "Sin stock"
-                      : item.quantity === 1
-                      ? "Última unidad"
-                      : item.quantity < 5
-                      ? `Últimas ${item.quantity}`
-                      : "En stock"}
+                    {(() => {
+                      if (item.variants) {
+                        const hasStock = Object.values(item.variants).some(
+                          (v) =>
+                            typeof v === "number"
+                              ? v > 0
+                              : Object.values(v).some((qty) => qty > 0)
+                        );
+                        return hasStock ? "En stock" : "Sin stock";
+                      }
+                      return item.quantity === 0
+                        ? "Sin stock"
+                        : item.quantity === 1
+                        ? "Última unidad"
+                        : item.quantity < 5
+                        ? `Últimas ${item.quantity}`
+                        : "En stock";
+                    })()}
                   </span>
+
                   {item.salePrice ? (
                     <div className="flex items-center gap-2">
                       <p className="text-lg text-gray-500 line-through">
@@ -176,15 +205,24 @@ export const ProductList = ({ selectedCategory }) => {
 
                   <button
                     className={`bg-primary-violet text-white px-2 py-2 mt-2 rounded-md transition duration-150 ${
-                      item.quantity === 0
+                      item.variants
+                        ? "hover:bg-purple-400"
+                        : item.quantity === 0
                         ? "bg-slate-500 cursor-not-allowed"
                         : "hover:bg-purple-400 cursor-pointer"
                     }`}
                     type="button"
-                    onClick={() => addToCartAlert(item)}
-                    disabled={item.quantity === 0}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (item.variants) {
+                        handleCard(item.id); // Redirige a detalle si tiene variantes
+                      } else if (item.quantity > 0) {
+                        addToCartAlert(item); // Añade directo si no tiene variantes
+                      }
+                    }}
+                    disabled={!item.variants && item.quantity === 0}
                   >
-                    Añadir al carrito
+                    {item.variants ? "Ver producto" : "Añadir al carrito"}
                   </button>
                 </div>
               </div>
@@ -202,6 +240,6 @@ export const ProductList = ({ selectedCategory }) => {
           <img src={arrowUp} alt="Flecha arriba" />
         </button>
       )}
-    </>
+    </div>
   );
 };

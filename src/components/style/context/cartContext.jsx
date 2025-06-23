@@ -21,12 +21,22 @@ export const CartProvider = ({ children }) => {
   }, [cart]);
 
   const addToCart = async (item) => {
-    const existingProduct = cart.find((prod) => prod.id === item.id);
     const now = Date.now();
+
+    const existingProduct = cart.find(
+      (prod) =>
+        prod.id === item.id &&
+        prod.selectedSize === item.selectedSize &&
+        prod.selectedColor === item.selectedColor &&
+        prod.selectedVariant === item.selectedVariant
+    );
 
     if (existingProduct) {
       const updatedCart = cart.map((product) =>
-        product.id === item.id
+        product.id === item.id &&
+        product.selectedSize === item.selectedSize &&
+        product.selectedColor === item.selectedColor &&
+        product.selectedVariant === item.selectedVariant
           ? {
               ...product,
               quantity: product.quantity + 1,
@@ -49,18 +59,39 @@ export const CartProvider = ({ children }) => {
 
     try {
       const productRef = doc(db, "sakura-products", item.id);
-      await updateDoc(productRef, {
-        quantity: item.quantity - 1,
-      });
-      item.quantity -= 1;
+      const productSnap = await getDoc(productRef);
+      const productData = productSnap.data();
+
+      if (productData.variants) {
+        const isSimple =
+          typeof Object.values(productData.variants)[0] === "number";
+
+        if (isSimple && item.selectedVariant) {
+          const currentQty = productData.variants[item.selectedVariant];
+          await updateDoc(productRef, {
+            [`variants.${item.selectedVariant}`]: currentQty - 1,
+          });
+        } else if (item.selectedSize && item.selectedColor) {
+          const currentQty =
+            productData.variants[item.selectedSize][item.selectedColor];
+          await updateDoc(productRef, {
+            [`variants.${item.selectedSize}.${item.selectedColor}`]:
+              currentQty - 1,
+          });
+        }
+      } else {
+        await updateDoc(productRef, {
+          quantity: item.quantity - 1,
+        });
+        item.quantity -= 1;
+      }
     } catch (error) {
       console.error("Error al actualizar stock:", error);
     }
   };
 
-  // Revisa cada 10 segundos si algún producto se venció (20 minutos)
   useEffect(() => {
-    const expirationTime = 20 * 60 * 1000;
+    const expirationTime = 1 * 60 * 1000;
 
     const interval = setInterval(async () => {
       const now = Date.now();
@@ -75,33 +106,53 @@ export const CartProvider = ({ children }) => {
             const productSnap = await getDoc(productRef);
 
             if (productSnap.exists()) {
-              const currentStock = productSnap.data().quantity || 0;
+              const data = productSnap.data();
 
-              await updateDoc(productRef, {
-                quantity: currentStock + product.quantity,
+              if (data.variants) {
+                const isSimple =
+                  typeof Object.values(data.variants)[0] === "number";
+
+                if (isSimple && product.selectedVariant) {
+                  const currentQty =
+                    data.variants[product.selectedVariant] || 0;
+                  await updateDoc(productRef, {
+                    [`variants.${product.selectedVariant}`]:
+                      currentQty + product.quantity,
+                  });
+                } else if (product.selectedSize && product.selectedColor) {
+                  const currentQty =
+                    data.variants[product.selectedSize][product.selectedColor];
+                  await updateDoc(productRef, {
+                    [`variants.${product.selectedSize}.${product.selectedColor}`]:
+                      currentQty + product.quantity,
+                  });
+                }
+              } else {
+                const currentStock = data.quantity || 0;
+                await updateDoc(productRef, {
+                  quantity: currentStock + product.quantity,
+                });
+              }
+
+              Swal.fire({
+                toast: true,
+                position: "top-end",
+                icon: "info",
+                title: `Producto liberado`,
+                html: `Se devolvió "${product.name}" al stock.<strong> Debido a que expiró su tiempo en el carrito.</strong>`,
+                imageUrl: product.image,
+                imageWidth: 100,
+                imageHeight: 100,
+                imageAlt: product.name,
+                customClass: {
+                  popup: "custom-toast",
+                  image: "rounded-full",
+                },
+                showConfirmButton: false,
+                timer: 4000,
+                timerProgressBar: true,
               });
             }
-
-            Swal.fire({
-              toast: true,
-              position: "top-end",
-              icon: "info",
-              title: `Producto liberado`,
-              html: `Se devolvió "${product.name}" al stock.<strong> Debido a que expiró su tiempo en el carrito.</strong>`,
-              imageUrl: product.image,
-              imageWidth: 100,
-              imageHeight: 100,
-              imageAlt: product.name,
-              customClass: {
-                popup: "custom-toast",
-                image: "rounded-full",
-              },
-              showConfirmButton: false,
-              timer: 4000,
-              timerProgressBar: true,
-            });
-
-            console.log(`Producto ${product.id} devuelto al stock`);
           } catch (error) {
             console.error("Error al devolver stock:", error);
           }

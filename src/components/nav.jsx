@@ -9,7 +9,7 @@ import miImagen from "../assets/logosakura.jpeg";
 
 export const Nav = () => {
   const [products, setProducts] = useState([]);
-  const [menuOpen, setMenuOpen] = useState(false); // Estado para controlar el menú hamburguesa
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const scrollTarget = localStorage.getItem("scrollToSection");
@@ -25,8 +25,6 @@ export const Nav = () => {
 
   useEffect(() => {
     const products = collection(db, "sakura-products");
-
-    // Listener para actualizaciones en tiempo real
     const unsubscribe = onSnapshot(products, (snapshot) => {
       const updatedProducts = snapshot.docs.map((doc) => ({
         id: doc.id,
@@ -35,34 +33,34 @@ export const Nav = () => {
       setProducts(updatedProducts);
     });
 
-    // Limpieza del listener al desmontar el componente
     return () => unsubscribe();
   }, []);
 
   return (
     <div>
-      <nav className="flex flex-row bg-white justify-between border-b-4 border-y-primary items-center relative md: ">
-        <Link
-          to={"/"}
-          className="flex flex-row items-center  w-full lg:w-1/4  "
-        >
+      {/* ⬇️ Este nav ahora es fijo */}
+      <nav className="flex flex-row bg-white justify-between border-b-4 border-y-primary items-center fixed top-0 left-0 right-0 z-50 shadow-md">
+        <Link to={"/"} className="flex flex-row items-center w-full lg:w-1/4">
           <img
             src={miImagen}
             alt="logo"
             className="ml-5 w-16 h-16 rounded-full"
           />
-          <h1 className="mx-6 text-3xl  text-center text-primary-dark">
+          <h1 className="mx-6 text-3xl text-center text-primary-dark">
             Sakura Market
           </h1>
         </Link>
-        {/* Search (ocultar en móviles) */}
+
+        {/* Search (oculto en móviles) */}
         <div className="hidden lg:block pb-5">
           <Search products={products} closeMenu={() => setMenuOpen(false)} />
         </div>
+
         <div className="lg:hidden">
           <AddToCart />
         </div>
-        {/* Menú Hamburguesa (visible en móviles) */}
+
+        {/* Botón hamburguesa */}
         <div className="lg:hidden m-6 z-20">
           <button
             className="text-primary-dark text-3xl"
@@ -72,7 +70,7 @@ export const Nav = () => {
           </button>
         </div>
 
-        {/* Menú principal (desktop) */}
+        {/* Menú desktop */}
         <ul className="hidden lg:flex w-5/12 m-6 text-primary-dark text-xl flex-row justify-between items-center">
           <Link
             to={"/"}
@@ -94,8 +92,7 @@ export const Nav = () => {
           </li>
         </ul>
 
-        {/* Menú desplegable (mobile) */}
-
+        {/* Menú desplegable mobile */}
         <div
           className={`absolute left-0 w-full bg-white shadow-lg z-10 transition-all duration-300 transform ${
             menuOpen
@@ -124,14 +121,13 @@ export const Nav = () => {
             >
               ¿Quienes somos?
             </Link>
-            <li
-              className="py-2 hover:scale-105 transition-transform duration-150"
-              onClick={() => setMenuOpen(false)}
-            ></li>
           </ul>
         </div>
       </nav>
-      <div className="w-auto pb-4 flex justify-center items-center bg-gray-50  lg:hidden">
+
+      {/* ⬇️ Este Search se mantiene debajo del nav (solo en mobile) */}
+      <div className="w-auto pb-4 flex justify-center items-center bg-gray-50 lg:hidden mt-24">
+        {/* 👈 Agregamos mt-24 para dejar espacio debajo del nav fijo */}
         <Search products={products} closeMenu={() => setMenuOpen(false)} />
       </div>
     </div>

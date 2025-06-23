@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Nav } from "./nav";
 import Swal from "sweetalert2";
 import Lottie from "lottie-react";
-import { Link } from "react-router-dom";
+
 import loaderAnimation from "../assets/Animation-11.json";
 import { useCart } from "./style/context/cartContext";
 import { Footer } from "./footer";
@@ -141,12 +141,6 @@ export const Resultados = ({ products }) => {
                     <p className="text-xl font-bold">${item.price}</p>
                   )}
 
-                  <Link
-                    to={`/product/${item.id}`}
-                    className=" bg-primary-violet rounded-lg h-9 text-white text-base mt-2 flex items-center justify-center hover:bg-purple-500 cursor-pointer"
-                  >
-                    Ver descripcion
-                  </Link>
                   <button
                     className={`bg-primary-violet text-white px-2 py-2 mt-2 rounded-md transition duration-150 ${
                       item.quantity === 0
