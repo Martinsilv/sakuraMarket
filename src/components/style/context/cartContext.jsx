@@ -91,7 +91,7 @@ export const CartProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const expirationTime = 1 * 60 * 1000;
+    const expirationTime = 20 * 60 * 1000;
 
     const interval = setInterval(async () => {
       const now = Date.now();
