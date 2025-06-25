@@ -87,12 +87,12 @@ export const Resultados = ({ products }) => {
     );
   }
   return (
-    <div className="bg-gray-50 h-full">
+    <div className="bg-gray-50 h-full ">
       <div>
         <Nav />
       </div>
-      <span>
-        <h2 className="text-2xl font-sans mb-4 ml-4">
+      <span className="">
+        <h2 className="text-2xl font-sans mb-4 ml-4 lg:pt-28">
           Resultados de búsqueda: "{searchText}"
         </h2>
       </span>
