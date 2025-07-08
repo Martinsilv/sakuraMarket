@@ -76,22 +76,25 @@ export const ProductList = ({ selectedCategory }) => {
       ? product
       : product.filter((item) => item.category === selectedCategory);
 
-  const filteredAndSortedProducts = [...filteredByCategory]
-    .filter((item) => {
-      if (filterOption === "stock") {
-        if (item.variants) {
-          return Object.values(item.variants).some((v) =>
-            typeof v === "number"
-              ? v > 0
-              : Object.values(v).some((qty) => qty > 0)
-          );
-        }
-        return item.quantity > 0;
+  const filteredAndSortedProducts = (() => {
+    const hasStock = (p) => {
+      if (p.variants) {
+        return Object.values(p.variants).some((v) =>
+          typeof v === "number"
+            ? v > 0
+            : Object.values(v).some((qty) => qty > 0)
+        );
       }
+      return p.quantity > 0;
+    };
+
+    const base = [...filteredByCategory].filter((item) => {
+      if (filterOption === "stock") return hasStock(item);
       if (filterOption === "on-sale") return !!item.salePrice;
       return true;
-    })
-    .sort((a, b) => {
+    });
+
+    const sortByFilter = (a, b) => {
       if (filterOption === "price-asc") {
         return (a.salePrice || a.price) - (b.salePrice || b.price);
       }
@@ -104,21 +107,22 @@ export const ProductList = ({ selectedCategory }) => {
       if (filterOption === "za") {
         return b.name.localeCompare(a.name);
       }
-      return 0;
-    })
-    .sort((a, b) => {
-      const hasStock = (p) => {
-        if (p.variants) {
-          return Object.values(p.variants).some((v) =>
-            typeof v === "number"
-              ? v > 0
-              : Object.values(v).some((qty) => qty > 0)
-          );
-        }
-        return p.quantity > 0;
-      };
-      return (hasStock(b) ? 1 : 0) - (hasStock(a) ? 1 : 0);
+      // Si es default, usamos timestamp (más nuevos arriba)
+      const timeA = a.timestamp?.seconds || 0;
+      const timeB = b.timestamp?.seconds || 0;
+      return timeB - timeA;
+    };
+
+    return base.sort((a, b) => {
+      const stockA = hasStock(a);
+      const stockB = hasStock(b);
+
+      if (stockA && !stockB) return -1;
+      if (!stockA && stockB) return 1;
+
+      return sortByFilter(a, b); // Aplica orden por filtro dentro del mismo grupo de stock
     });
+  })();
 
   if (loading) {
     return (
