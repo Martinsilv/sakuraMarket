@@ -56,14 +56,14 @@ export const Search = ({ products, closeMenu }) => {
       >
         <input
           type="text"
-          className="w-full border-4 border-primary-pink focus:border-primary-dark bg-white text-black rounded-lg p-2 transition-colors duration-200 outline-none"
+          className="w-full font-fredoka border-4 border-primary-pink focus:border-primary-dark bg-white text-black rounded-lg p-2 transition-colors duration-200 outline-none"
           placeholder="Buscar producto..."
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
         />
         <button
           type="submit"
-          className="absolute right-2 top-7 text-white bg-primary-dark px-3 py-1 rounded-md hover:bg-primary-violet"
+          className="absolute right-2 top-7 text-white bg-primary-dark px-3 py-1 rounded-md hover:bg-primary-violet font-fredoka font-normal"
         >
           Buscar
         </button>

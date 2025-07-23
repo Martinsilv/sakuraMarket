@@ -21,7 +21,7 @@ export const ScrollToProducts = () => {
   return (
     <span
       onClick={handleScroll}
-      className="cursor-pointer hover:scale-110 transition-transform duration-150"
+      className=" cursor-pointer hover:scale-110 transition-transform duration-150"
     >
       Productos
     </span>

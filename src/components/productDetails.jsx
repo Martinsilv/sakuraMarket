@@ -197,7 +197,7 @@ export const ProductDetails = () => {
           autoplay
           className="w-40 h-40"
         />
-        <p className="text-lg font-medium text-gray-500">
+        <p className="text-lg font-medium font-fredoka text-gray-500">
           Cargando producto...
         </p>
       </div>
@@ -207,7 +207,7 @@ export const ProductDetails = () => {
   if (!product) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p className="text-lg font-medium text-red-500">
+        <p className="text-lg font-medium font-fredoka text-red-500">
           Producto no encontrado.
         </p>
       </div>
@@ -266,10 +266,10 @@ export const ProductDetails = () => {
           </div>
 
           <div className="p-6 md:w-1/2 flex flex-col justify-between">
-            <h1 className="text-2xl md:text-4xl font-bold text-gray-800 mb-4">
+            <h1 className="text-2xl md:text-4xl font-semibold text-gray-800 mb-4 font-fredoka">
               {product.name}
             </h1>
-            <p className="text-base md:text-lg text-gray-600 mb-6">
+            <p className="text-base md:text-lg text-gray-600 mb-6 font-fredoka">
               {product.description || "Sin descripción disponible."}
             </p>
 
@@ -283,7 +283,7 @@ export const ProductDetails = () => {
                     <select
                       value={selectedVariant}
                       onChange={(e) => setSelectedVariant(e.target.value)}
-                      className="w-full border border-gray-300 rounded px-3 py-2"
+                      className="w-full border border-gray-300 rounded px-3 py-2 font-fredoka"
                     >
                       <option value="">Seleccioná una opción</option>
                       {simpleOptions.map(([option, qty]) => (
@@ -296,7 +296,7 @@ export const ProductDetails = () => {
                 ) : (
                   <>
                     <div className="mb-4">
-                      <label className="block text-sm font-medium mb-1">
+                      <label className="block text-sm font-medium mb-1 font-fredoka">
                         Talle:
                       </label>
                       <select

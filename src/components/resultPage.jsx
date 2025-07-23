@@ -80,7 +80,7 @@ export const Resultados = ({ products }) => {
           loop={true}
           className="w-32 h-32 top-0"
         />
-        <p className="text-lg font-medium text-gray-500">
+        <p className="text-lg font-medium font-fredoka text-gray-500">
           Cargando producto...
         </p>
       </div>
@@ -92,7 +92,7 @@ export const Resultados = ({ products }) => {
         <Nav />
       </div>
       <span className="">
-        <h2 className="text-2xl font-sans mb-4 ml-4 lg:pt-28">
+        <h2 className="text-2xl font-fredoka mb-4 ml-4 lg:pt-28">
           Resultados de búsqueda: "{searchText}"
         </h2>
       </span>
@@ -102,13 +102,13 @@ export const Resultados = ({ products }) => {
             <div key={item.id} className="flex justify-center">
               <div
                 onClick={() => handleCard(item.id)}
-                className="transform transition duration-300 hover:scale-105 rounded-lg shadow-lg h-fit w-full max-w-64 hover:shadow-xl bg-white"
+                className="transform transition duration-300 hover:scale-105 rounded-lg shadow-lg h-fit w-full max-w-64 hover:shadow-xl bg-white relative"
               >
-                {item.salePrice ? (
-                  <div className=" w-20 h-6 rounded-xl bg-green-600 absolute top-4 left-2 flex items-center justify-center text-white font-bold text-sm">
+                {item.salePrice && (
+                  <div className="absolute w-20 h-6 rounded-xl bg-green-600 top-4 left-2 flex items-center justify-center text-white font-bold text-sm">
                     OFERTA
                   </div>
-                ) : null}
+                )}
 
                 <img
                   src={item.image}
@@ -120,14 +120,26 @@ export const Resultados = ({ products }) => {
                     {item.name}
                   </h2>
                   <span className="text-sm font-thin opacity-75">
-                    {item.quantity === 0
-                      ? "Sin stock"
-                      : item.quantity === 1
-                      ? "Última unidad"
-                      : item.quantity < 5
-                      ? `Últimas ${item.quantity}`
-                      : "En stock"}
+                    {(() => {
+                      if (item.variants) {
+                        const hasStock = Object.values(item.variants).some(
+                          (v) =>
+                            typeof v === "number"
+                              ? v > 0
+                              : Object.values(v).some((qty) => qty > 0)
+                        );
+                        return hasStock ? "En stock" : "Sin stock";
+                      }
+                      return item.quantity === 0
+                        ? "Sin stock"
+                        : item.quantity === 1
+                        ? "Última unidad"
+                        : item.quantity < 5
+                        ? `Últimas ${item.quantity}`
+                        : "En stock";
+                    })()}
                   </span>
+
                   {item.salePrice ? (
                     <div className="flex items-center gap-2">
                       <p className="text-lg text-gray-500 line-through">
@@ -143,15 +155,24 @@ export const Resultados = ({ products }) => {
 
                   <button
                     className={`bg-primary-violet text-white px-2 py-2 mt-2 rounded-md transition duration-150 ${
-                      item.quantity === 0
-                        ? "bg-gray-500 cursor-not-allowed"
+                      item.variants
+                        ? "hover:bg-purple-400"
+                        : item.quantity === 0
+                        ? "bg-slate-500 cursor-not-allowed"
                         : "hover:bg-purple-400 cursor-pointer"
                     }`}
                     type="button"
-                    onClick={() => addToCartAlert(item)}
-                    disabled={item.quantity === 0}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (item.variants) {
+                        handleCard(item.id); // Redirige a detalle si tiene variantes
+                      } else if (item.quantity > 0) {
+                        addToCartAlert(item); // Añade directo si no tiene variantes
+                      }
+                    }}
+                    disabled={!item.variants && item.quantity === 0}
                   >
-                    Añadir al carrito
+                    {item.variants ? "Ver producto" : "Añadir al carrito"}
                   </button>
                 </div>
               </div>

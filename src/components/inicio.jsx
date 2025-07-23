@@ -29,6 +29,23 @@ export const Inicio = () => {
       });
     }
   };
+  const carouselLinks = [
+    null, // Primera imagen sin enlace
+    "/product/AfoPXvjoz9DjGnif9AcI", // Segunda imagen(fanta)
+    "/product/PxaYYGDHtgcKic2JhKyt", // Tercera imagen(crybaby)
+    "/product/ipjFBbpBvh51GcsNj15c", // Cuarta imagen(smiski)
+    "/resultados?search=ramune", // Quinta imagen(ramune)
+    "/product/hGgRlIbXRXRK1gQfqW7R", // Sexta imagen(pokemon-grisines)
+    "/product/GuF3w1MZCyxgKlupPYzl", // Séptima imagen(kuromi-cajasorpresa)
+    "/resultados?search=sailor", // Octava imagen(sailor-moon)
+    "/resultados?search=one%20piece", // Novena imagen(one-piece)
+    "/product/Ll6bmU8N6KGtHiRoJbT9", // Décima imagen(buldak-pote)
+    "/resultados?search=buldak", // Undécima imagen(buldak palitos)
+    "/product/2zyrceyi09mFxpF2yfss", // Duodécima imagen(monsters keen)
+    "/product/Gd4svkB9d2v0DT61RNSu", // Decimotercera imagen(monsters dragon ice tea)
+    // Agrega más enlaces según tus imágenes del carrusel
+  ];
+
   const Button = ({ text, img, src, alt, onClick }) => (
     <div className="flex flex-col items-center justify-center">
       <button
@@ -45,11 +62,13 @@ export const Inicio = () => {
     <div className="bg-gray-50 h-full">
       <header className="lg:pt-20">
         <Nav />
-        <Carrousel />
+        <Carrousel links={carouselLinks} />
       </header>
       <body id="products-section">
         <div className="flex flex-col items-center justify-center p-6 md:p-12">
-          <h1 className="text-2xl font-bold mb-8 pt-16 ">Productos</h1>
+          <h1 className=" font-fredoka font-semibold text-3xl  mb-8 pt-16 ">
+            Productos
+          </h1>
           <div className="grid grid-cols-2  gap-6  ">
             {/* Botón "Todos" */}
             <Button

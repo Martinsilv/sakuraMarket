@@ -6,6 +6,7 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 import { ScrollToProducts } from "./scrollProducts";
 import miImagen from "../assets/logosakura.jpeg";
+import { motion, AnimatePresence } from "framer-motion";
 
 export const Nav = () => {
   const [products, setProducts] = useState([]);
@@ -36,17 +37,75 @@ export const Nav = () => {
     return () => unsubscribe();
   }, []);
 
+  // Variantes de animación para el menú
+  const menuVariants = {
+    closed: {
+      opacity: 0,
+      height: 0,
+      y: -20,
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+        when: "afterChildren",
+        staggerChildren: 0.05,
+        staggerDirection: -1,
+      },
+    },
+    open: {
+      opacity: 1,
+      height: "auto",
+      y: 0,
+      transition: {
+        duration: 0.4,
+        ease: "easeOut",
+        when: "beforeChildren",
+        staggerChildren: 0.1,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  // Variantes para los elementos del menú
+  const itemVariants = {
+    closed: {
+      opacity: 0,
+      y: -10,
+      scale: 0.95,
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
+    open: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        duration: 0.1,
+        ease: "easeOut",
+      },
+    },
+  };
+
+  // Variantes para el botón hamburguesa
+  const buttonVariants = {
+    closed: { rotate: 0 },
+    open: { rotate: 180 },
+  };
+
   return (
     <div>
       {/* ⬇️ Este nav ahora es fijo */}
       <nav className="flex flex-row bg-white justify-between border-b-4 border-y-primary items-center fixed top-0 left-0 right-0 z-50 shadow-md">
         <Link to={"/"} className="flex flex-row items-center w-full lg:w-1/4">
-          <img
+          <motion.img
             src={miImagen}
             alt="logo"
             className="ml-5 w-16 h-16 rounded-full"
+            whileHover={{ scale: 1.05, rotate: 5 }}
+            transition={{ duration: 0.2 }}
           />
-          <h1 className="mx-6 text-3xl text-center text-primary-dark">
+          <h1 className="font-fredoka font-medium mx-6 text-3xl text-center text-primary-dark">
             Sakura Market
           </h1>
         </Link>
@@ -62,67 +121,101 @@ export const Nav = () => {
 
         {/* Botón hamburguesa */}
         <div className="lg:hidden m-6 z-20">
-          <button
+          <motion.button
             className="text-primary-dark text-3xl"
             onClick={() => setMenuOpen(!menuOpen)}
+            variants={buttonVariants}
+            animate={menuOpen ? "open" : "closed"}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.2 }}
           >
             {menuOpen ? "X" : "☰"}
-          </button>
+          </motion.button>
         </div>
 
         {/* Menú desktop */}
         <ul className="hidden lg:flex w-5/12 m-6 text-primary-dark text-xl flex-row justify-between items-center">
-          <Link
-            to={"/"}
-            className="hover:scale-110 transition-transform duration-150"
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            transition={{ duration: 0.15 }}
           >
-            Inicio
-          </Link>
-          <li className="hover:scale-110 transition-transform duration-150">
+            <Link to={"/"}>Inicio</Link>
+          </motion.div>
+          <motion.li
+            whileHover={{ scale: 1.1 }}
+            transition={{ duration: 0.15 }}
+          >
             <ScrollToProducts />
-          </li>
-          <Link
-            to={"/quienesSomos"}
-            className="hover:scale-110 transition-transform duration-150"
+          </motion.li>
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            transition={{ duration: 0.15 }}
           >
-            ¿Quienes somos?
-          </Link>
-          <li className="hover:scale-105 transition-transform duration-150">
+            <Link to={"/quienesSomos"}>¿Quienes somos?</Link>
+          </motion.div>
+          <motion.li
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.15 }}
+          >
             <AddToCart />
-          </li>
+          </motion.li>
         </ul>
 
-        {/* Menú desplegable mobile */}
-        <div
-          className={`absolute left-0 w-full bg-white shadow-lg z-10 transition-all duration-300 transform ${
-            menuOpen
-              ? "top-full opacity-100"
-              : "top-0 opacity-0 pointer-events-none"
-          }`}
-        >
-          <ul className="text-primary-dark text-lg flex flex-col items-center py-4">
-            <Link
-              to={"/"}
-              className="py-2 hover:scale-110 transition-transform duration-150"
-              onClick={() => setMenuOpen(false)}
+        {/* Menú desplegable mobile con Framer Motion */}
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              className="absolute left-0 w-full bg-white shadow-lg z-10 overflow-hidden top-full"
+              variants={menuVariants}
+              initial="closed"
+              animate="open"
+              exit="closed"
             >
-              Inicio
-            </Link>
-            <li
-              className="py-2 hover:scale-110 transition-transform duration-150"
-              onClick={() => setMenuOpen(false)}
-            >
-              <ScrollToProducts />
-            </li>
-            <Link
-              to={"/quienesSomos"}
-              className="py-2 hover:scale-110 transition-transform duration-150"
-              onClick={() => setMenuOpen(false)}
-            >
-              ¿Quienes somos?
-            </Link>
-          </ul>
-        </div>
+              <motion.ul className="font-fredoka font-normal text-primary-dark text-xl flex flex-col items-center py-4">
+                <motion.div variants={itemVariants}>
+                  <Link
+                    to={"/"}
+                    className="py-2 block"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <motion.span
+                      whileHover={{ scale: 1.1, color: "#e91e63" }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      Inicio
+                    </motion.span>
+                  </Link>
+                </motion.div>
+
+                <motion.li variants={itemVariants} className="py-2">
+                  <motion.div
+                    whileHover={{ scale: 1.1, color: "#e91e63" }}
+                    transition={{ duration: 0.2 }}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <ScrollToProducts />
+                  </motion.div>
+                </motion.li>
+
+                <motion.div variants={itemVariants}>
+                  <Link
+                    to={"/quienesSomos"}
+                    className="py-2 block"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <motion.span
+                      whileHover={{ scale: 1.1, color: "#e91e63" }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      ¿Quienes somos?
+                    </motion.span>
+                  </Link>
+                </motion.div>
+              </motion.ul>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* ⬇️ Este Search se mantiene debajo del nav (solo en mobile) */}
