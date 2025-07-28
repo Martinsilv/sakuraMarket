@@ -63,27 +63,128 @@ export const ProductDetails = () => {
   };
 
   const addToCartAlert = async () => {
+    // Configuración kawaii para todos los alerts
+    const kawaiiStyle = {
+      background: "linear-gradient(135deg, #ffeef8 0%, #fff5f5 100%)",
+      color: "#6b4c57",
+      borderRadius: "20px",
+      border: "2px solid #f8d7da",
+      fontFamily: '"Nunito", "Comic Sans MS", cursive',
+      customClass: {
+        popup: "kawaii-popup",
+        title: "kawaii-title",
+        content: "kawaii-content",
+        confirmButton: "kawaii-confirm-btn",
+        cancelButton: "kawaii-cancel-btn",
+      },
+    };
+
+    // Estilos CSS inline para el kawaii look
+    const kawaiiCSS = `
+    <style>
+      .kawaii-popup {
+        box-shadow: 0 10px 30px rgba(255, 182, 193, 0.4) !important;
+        border: 3px solid #ffb6c1 !important;
+      }
+      .kawaii-title {
+        color: #d63384 !important;
+        font-weight: 700 !important;
+        font-size: 1.3em !important;
+      }
+      .kawaii-content {
+        color: #6b4c57 !important;
+        font-size: 0.95em !important;
+      }
+      .kawaii-confirm-btn {
+        background: linear-gradient(45deg, #ff9a9e, #fecfef) !important;
+        border: none !important;
+        border-radius: 25px !important;
+        padding: 12px 25px !important;
+        font-weight: 600 !important;
+        color: white !important;
+        box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4) !important;
+        transition: all 0.3s ease !important;
+      }
+      .kawaii-confirm-btn:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(255, 154, 158, 0.6) !important;
+      }
+      .kawaii-cancel-btn {
+        background: linear-gradient(45deg, #e2e8f0, #f1f5f9) !important;
+        border: 2px solid #cbd5e1 !important;
+        border-radius: 25px !important;
+        padding: 12px 25px !important;
+        font-weight: 600 !important;
+        color: #64748b !important;
+        transition: all 0.3s ease !important;
+      }
+      .kawaii-cancel-btn:hover {
+        transform: translateY(-1px) !important;
+        border-color: #94a3b8 !important;
+      }
+    </style>
+  `;
+
+    // Inyectar estilos
+    if (!document.getElementById("kawaii-styles")) {
+      const styleElement = document.createElement("div");
+      styleElement.id = "kawaii-styles";
+      styleElement.innerHTML = kawaiiCSS;
+      document.head.appendChild(styleElement);
+    }
+
     if (product.variants) {
       if (isSimpleVariant) {
         if (!selectedVariant) {
-          Swal.fire("Seleccioná una opción antes de añadir al carrito");
+          Swal.fire({
+            title: "¡Oopsie! (｡◕‿◕｡)",
+            text: "Seleccioná una opción antes de añadir al carrito",
+            icon: "info",
+            iconColor: "#ffc0cb",
+            ...kawaiiStyle,
+            confirmButtonText: "¡Entendido! ♡",
+          });
           return;
         }
         const variantQty = product.variants[selectedVariant] ?? 0;
         if (variantQty <= 0) {
-          Swal.fire("Sin stock", "No hay más unidades disponibles.", "warning");
+          Swal.fire({
+            title: "¡Oh no!",
+            text: "No hay más unidades disponibles",
+            icon: "warning",
+            iconColor: "#ffa726",
+            ...kawaiiStyle,
+            confirmButtonText: "Vale",
+          });
           return;
         }
 
         Swal.fire({
           title: "¿Añadir al carrito?",
-          text: `Producto: ${product.name} - Opción: ${selectedVariant}`,
+          text: `${product.name} - ${selectedVariant}`,
           icon: "question",
+          iconColor: "#ff69b4",
           showCancelButton: true,
-          confirmButtonText: "Sí",
-          cancelButtonText: "Cancelar",
+          confirmButtonText: "¡Sí!",
+          cancelButtonText: "No, gracias",
+          ...kawaiiStyle,
         }).then(async (result) => {
           if (result.isConfirmed) {
+            // Mostrar loading
+            Swal.fire({
+              title: "Añadiendo...",
+              text: "Procesando tu pedido",
+              icon: "info",
+              iconColor: "#ff69b4",
+              allowOutsideClick: false,
+              allowEscapeKey: false,
+              showConfirmButton: false,
+              didOpen: () => {
+                Swal.showLoading();
+              },
+              ...kawaiiStyle,
+            });
+
             const updatedQty = variantQty - 1;
 
             const itemToAdd = {
@@ -105,30 +206,70 @@ export const ProductDetails = () => {
               },
             }));
 
-            Swal.fire("Añadido", "Producto añadido al carrito", "success");
+            Swal.fire({
+              title: "¡Agregado!",
+              text: "Producto añadido al carrito",
+              icon: "success",
+              iconColor: "#4ade80",
+              ...kawaiiStyle,
+              confirmButtonText: "¡Genial!",
+              timer: 2000,
+              timerProgressBar: true,
+            });
           }
         });
       } else {
         if (!selectedSize || !selectedColor) {
-          Swal.fire("Seleccioná talle y color");
+          Swal.fire({
+            title: "¡Falta algo!",
+            text: "Seleccioná talle y color",
+            icon: "info",
+            iconColor: "#ffc0cb",
+            ...kawaiiStyle,
+            confirmButtonText: "¡Okey!",
+          });
           return;
         }
         const variantQty =
           product.variants?.[selectedSize]?.[selectedColor] ?? 0;
         if (variantQty <= 0) {
-          Swal.fire("Sin stock", "No hay unidades disponibles", "warning");
+          Swal.fire({
+            title: "¡Ups!",
+            text: "No hay unidades disponibles",
+            icon: "warning",
+            iconColor: "#ffa726",
+            ...kawaiiStyle,
+            confirmButtonText: "Vale",
+          });
           return;
         }
 
         Swal.fire({
           title: "¿Añadir al carrito?",
-          text: `Producto: ${product.name} - Talle: ${selectedSize} - Color: ${selectedColor}`,
+          text: `${product.name} - ${selectedSize} - ${selectedColor}`,
           icon: "question",
+          iconColor: "#ff69b4",
           showCancelButton: true,
-          confirmButtonText: "Sí",
-          cancelButtonText: "Cancelar",
+          confirmButtonText: "¡Sí!",
+          cancelButtonText: "No, gracias",
+          ...kawaiiStyle,
         }).then(async (result) => {
           if (result.isConfirmed) {
+            // Mostrar loading
+            Swal.fire({
+              title: "Añadiendo...",
+              text: "Procesando tu pedido",
+              icon: "info",
+              iconColor: "#ff69b4",
+              allowOutsideClick: false,
+              allowEscapeKey: false,
+              showConfirmButton: false,
+              didOpen: () => {
+                Swal.showLoading();
+              },
+              ...kawaiiStyle,
+            });
+
             const updatedQty = variantQty - 1;
 
             const itemToAdd = {
@@ -149,26 +290,59 @@ export const ProductDetails = () => {
               return updated;
             });
 
-            Swal.fire("Añadido", "Producto añadido al carrito", "success");
+            Swal.fire({
+              title: "¡Agregado!",
+              text: "Producto añadido al carrito",
+              icon: "success",
+              iconColor: "#4ade80",
+              ...kawaiiStyle,
+              confirmButtonText: "¡Genial!",
+              timer: 2000,
+              timerProgressBar: true,
+            });
           }
         });
       }
     } else {
       // Producto sin variantes
       if (product.quantity <= 0) {
-        Swal.fire("Sin stock", "Producto no disponible", "warning");
+        Swal.fire({
+          title: "¡Oh no!",
+          text: "Producto no disponible",
+          icon: "warning",
+          iconColor: "#ffa726",
+          ...kawaiiStyle,
+          confirmButtonText: "Vale",
+        });
         return;
       }
 
       Swal.fire({
         title: "¿Añadir al carrito?",
-        text: `Producto: ${product.name}`,
+        text: product.name,
         icon: "question",
+        iconColor: "#ff69b4",
         showCancelButton: true,
-        confirmButtonText: "Sí",
-        cancelButtonText: "Cancelar",
+        confirmButtonText: "¡Sí!",
+        cancelButtonText: "No, gracias",
+        ...kawaiiStyle,
       }).then(async (result) => {
         if (result.isConfirmed) {
+          // Mostrar loading
+          Swal.fire({
+            title: "Añadiendo...",
+            text: "Procesando tu pedido",
+            icon: "info",
+            iconColor: "#ff69b4",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+            ...kawaiiStyle,
+          });
+
           const itemToAdd = { ...product };
           await addToCart(itemToAdd);
 
@@ -182,7 +356,16 @@ export const ProductDetails = () => {
             quantity: prev.quantity - 1,
           }));
 
-          Swal.fire("Añadido", "Producto añadido al carrito", "success");
+          Swal.fire({
+            title: "¡Agregado!",
+            text: "Producto añadido al carrito",
+            icon: "success",
+            iconColor: "#4ade80",
+            ...kawaiiStyle,
+            confirmButtonText: "¡Genial!",
+            timer: 2000,
+            timerProgressBar: true,
+          });
         }
       });
     }

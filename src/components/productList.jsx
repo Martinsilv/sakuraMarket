@@ -46,23 +46,134 @@ export const ProductList = ({ selectedCategory }) => {
   };
 
   const addToCartAlert = (product) => {
+    // Configuración kawaii para todos los alerts
+    const kawaiiStyle = {
+      background: "linear-gradient(135deg, #ffeef8 0%, #fff5f5 100%)",
+      color: "#6b4c57",
+      borderRadius: "20px",
+      border: "2px solid #f8d7da",
+      fontFamily: '"Nunito", "Comic Sans MS", cursive',
+      customClass: {
+        popup: "kawaii-popup",
+        title: "kawaii-title",
+        content: "kawaii-content",
+        confirmButton: "kawaii-confirm-btn",
+        cancelButton: "kawaii-cancel-btn",
+      },
+    };
+
+    // Estilos CSS inline para el kawaii look
+    const kawaiiCSS = `
+    <style>
+      .kawaii-popup {
+        box-shadow: 0 10px 30px rgba(255, 182, 193, 0.4) !important;
+        border: 3px solid #ffb6c1 !important;
+      }
+      .kawaii-title {
+        color: #d63384 !important;
+        font-weight: 700 !important;
+        font-size: 1.3em !important;
+      }
+      .kawaii-content {
+        color: #6b4c57 !important;
+        font-size: 0.95em !important;
+      }
+      .kawaii-confirm-btn {
+        background: linear-gradient(45deg, #ff9a9e, #fecfef) !important;
+        border: none !important;
+        border-radius: 25px !important;
+        padding: 12px 25px !important;
+        font-weight: 600 !important;
+        color: white !important;
+        box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4) !important;
+        transition: all 0.3s ease !important;
+      }
+      .kawaii-confirm-btn:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(255, 154, 158, 0.6) !important;
+      }
+      .kawaii-cancel-btn {
+        background: linear-gradient(45deg, #e2e8f0, #f1f5f9) !important;
+        border: 2px solid #cbd5e1 !important;
+        border-radius: 25px !important;
+        padding: 12px 25px !important;
+        font-weight: 600 !important;
+        color: #64748b !important;
+        transition: all 0.3s ease !important;
+      }
+      .kawaii-cancel-btn:hover {
+        transform: translateY(-1px) !important;
+        border-color: #94a3b8 !important;
+      }
+    </style>
+  `;
+
+    // Inyectar estilos
+    if (!document.getElementById("kawaii-styles")) {
+      const styleElement = document.createElement("div");
+      styleElement.id = "kawaii-styles";
+      styleElement.innerHTML = kawaiiCSS;
+      document.head.appendChild(styleElement);
+    }
+
     Swal.fire({
-      title: "¿Deseas añadir este producto al carrito?",
+      title: "¿Añadir al carrito?",
       text: `Producto: ${product.name}`,
       icon: "question",
+      iconColor: "#ff69b4",
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#cd5547",
-      confirmButtonText: "Sí, añadir",
+      confirmButtonText: "¡Sí!",
       cancelButtonText: "Cancelar",
+      ...kawaiiStyle,
     }).then((result) => {
       if (result.isConfirmed) {
-        addToCart(product);
-        Swal.fire(
-          "Añadido!",
-          "El producto ha sido añadido al carrito.",
-          "success"
-        );
+        // Mostrar loading
+        Swal.fire({
+          title: "Añadiendo...",
+          text: "Procesando tu pedido",
+          icon: "info",
+          iconColor: "#ff69b4",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          showConfirmButton: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+          ...kawaiiStyle,
+        });
+
+        // Simular async si addToCart retorna una promesa, sino usar setTimeout
+        const addResult = addToCart(product);
+
+        if (addResult && typeof addResult.then === "function") {
+          // Si addToCart es async
+          addResult.then(() => {
+            Swal.fire({
+              title: "¡Agregado!",
+              text: "El producto ha sido añadido al carrito",
+              icon: "success",
+              iconColor: "#4ade80",
+              ...kawaiiStyle,
+              confirmButtonText: "¡Genial!",
+              timer: 1000,
+              timerProgressBar: true,
+            });
+          });
+        } else {
+          // Si addToCart es síncrono, simular un pequeño delay para mostrar la carga
+          setTimeout(() => {
+            Swal.fire({
+              title: "¡Agregado!",
+              text: "El producto ha sido añadido al carrito",
+              icon: "success",
+              iconColor: "#4ade80",
+              ...kawaiiStyle,
+              confirmButtonText: "¡Genial!",
+              timer: 100,
+              timerProgressBar: true,
+            });
+          }, 500);
+        }
       }
     });
   };
