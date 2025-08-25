@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import QuienesSomos from "./components/quienesSomos";
+//import detectarCamposFaltantes from "./components/arreglo";
 
 function App() {
   const [products, setProduct] = useState([]);
@@ -28,6 +29,9 @@ function App() {
 
     return () => unsubscribe();
   }, []);
+  /*   useEffect(() => {
+    detectarCamposFaltantes();
+  }, []); */
   return (
     <CartProvider>
       <BrowserRouter>
