@@ -1,5 +1,13 @@
 import { createContext, useContext, useState, useEffect, useRef } from "react";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { db } from "../../../../firebaseConfig";
 import Swal from "sweetalert2";
 import "../../../App.css";
@@ -20,7 +28,29 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
-  const addToCart = async (item) => {
+  // Función para obtener el producto de palillos chinos
+  const getChopsticksProduct = async () => {
+    try {
+      const productsRef = collection(db, "sakura-products");
+      const q = query(productsRef, where("name", "==", "Palitos chinos"));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        const doc = querySnapshot.docs[0];
+        return {
+          id: doc.id,
+          ...doc.data(),
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error("Error al obtener palillos chinos:", error);
+      return null;
+    }
+  };
+
+  // Función para añadir producto directamente al carrito (sin alert)
+  const addProductToCart = async (item) => {
     const now = Date.now();
 
     const existingProduct = cart.find(
@@ -46,8 +76,8 @@ export const CartProvider = ({ children }) => {
       );
       setCart(updatedCart);
     } else {
-      setCart([
-        ...cart,
+      setCart((prevCart) => [
+        ...prevCart,
         {
           ...item,
           quantity: 1,
@@ -88,6 +118,88 @@ export const CartProvider = ({ children }) => {
     } catch (error) {
       console.error("Error al actualizar stock:", error);
     }
+  };
+
+  const addToCart = async (item) => {
+    // Si el producto es de categoría "ramen", mostrar alert para añadir palillos
+    if (item.category === "ramen") {
+      try {
+        const chopsticksProduct = await getChopsticksProduct();
+
+        if (chopsticksProduct && chopsticksProduct.quantity > 0) {
+          // Verificar si ya tiene palillos en el carrito
+          const hasChopsticks = cart.some(
+            (prod) => prod.name === "Palitos chinos"
+          );
+
+          if (!hasChopsticks) {
+            const result = await Swal.fire({
+              title: "🍜 ¿Quieres añadir palillos chinos?",
+              html: `
+                <div style="text-align: center; flex-direction: column; justify-content: center; align-items: center;">
+                  <img src="${chopsticksProduct.image}" 
+                       alt="Palitos chinos" 
+                       style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px; margin: 15px 0;">
+                  <p style="margin: 15px 0; color: #666; font-size: 14px;">
+                    ${chopsticksProduct.description}
+                  </p>
+                  <p style="font-size: 18px; font-weight: bold; color: rgb(13, 180, 13);">
+                    $${chopsticksProduct.price.toLocaleString()}
+                  </p>
+                </div>
+              `,
+              icon: "question",
+              showCancelButton: true,
+              confirmButtonText: "✅ Sí, añadir palillos",
+              cancelButtonText: "❌ No, gracias",
+              confirmButtonColor: "#27ae60",
+              cancelButtonColor: "#95a5a6",
+              customClass: {
+                popup: "animated bounceIn",
+              },
+            });
+
+            if (result.isConfirmed) {
+              // Añadir primero el ramen
+              await addProductToCart(item);
+
+              // Luego añadir los palillos
+              await addProductToCart(chopsticksProduct);
+
+              Swal.fire({
+                toast: true,
+                position: "top-end",
+                icon: "success",
+                title: "¡Productos añadidos!",
+                text: `${item.name} y Palillos chinos añadidos al carrito`,
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+              });
+
+              return; // Salir aquí para evitar añadir el ramen dos veces
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error al procesar palillos chinos:", error);
+      }
+    }
+
+    // Añadir el producto original (ramen sin palillos, o cualquier otro producto)
+    await addProductToCart(item);
+
+    // Toast de confirmación
+    Swal.fire({
+      toast: true,
+      position: "top-end",
+      icon: "success",
+      title: "¡Añadido al carrito!",
+      text: `${item.name} añadido al carrito`,
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true,
+    });
   };
 
   useEffect(() => {
