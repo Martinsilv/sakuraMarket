@@ -13,6 +13,7 @@ import iconLibreria from "../assets/libro.png";
 import iconDeco from "../assets/lampara.png";
 import iconPlus from "../assets/plus.png";
 import iconbox from "../assets/suscripcion.png";
+import iconSkinCare from "../assets/brillo.png";
 import { ProductList } from "./productList";
 import { Footer } from "./footer";
 import { motion, AnimatePresence } from "framer-motion";
@@ -206,6 +207,17 @@ export const Inicio = () => {
                     text="Sakura Deco"
                     onClick={() => {
                       setSelectedCategory("deco");
+                      handleScroll();
+                      setShowCategories(false);
+                    }}
+                  />
+                  <Button
+                    img
+                    src={iconSkinCare}
+                    alt="cuidado de la piel"
+                    text="Skin Care"
+                    onClick={() => {
+                      setSelectedCategory("skincare");
                       handleScroll();
                       setShowCategories(false);
                     }}
